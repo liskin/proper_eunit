@@ -4,10 +4,13 @@
 parse_transform( AST, _Options ) ->
 	Forms = erl_syntax:form_list( AST ),
 	% TODO: use analyze_forms
-	Opts = erl_syntax_lib:fold( fun find_opts/2, [], Forms ),
-	Props = erl_syntax_lib:fold( fun find_props/2, [], Forms ),
+	Opts = find_opts( Forms ),
+	Props = find_props( Forms ),
 	PropForms = [ test_generator( Prop, Opts ) || Prop <- Props ],
 	erl_syntax:revert_forms( [ strip_opts( Forms ) | PropForms ] ).
+
+find_opts( Forms ) ->
+	erl_syntax_lib:fold( fun find_opts/2, [], Forms ).
 
 find_opts( Node, Opts ) ->
 	try
@@ -45,6 +48,9 @@ is_prop_name( Name ) when is_atom( Name ) ->
 	is_prop_name( atom_to_list( Name ) );
 is_prop_name( Name ) when is_list( Name ) ->
 	lists:prefix( "prop_", Name ).
+
+find_props( Forms ) ->
+	erl_syntax_lib:fold( fun find_props/2, [], Forms ).
 
 find_props( Node, Props ) ->
 	try
