@@ -3,7 +3,6 @@
 
 -define( EUNIT_NOAUTO, 1 ).
 -include( "pt_proper_eunit.hrl" ).
--proper_opts( [ { prop_3, any_to_integer } ] ).
 
 tests() ->
 	Opts = [ no_tty ],
@@ -18,5 +17,6 @@ prop_1() ->
 prop_2() ->
 	?FORALL( X, integer( 0, 10 ), X =:= X ).
 
+-proper_opts( [ { prop_3, any_to_integer } ] ).
 prop_3() ->
 	?FORALL( X, any(), is_integer( X ) ).

@@ -7,7 +7,7 @@ parse_transform( AST, _Options ) ->
 	Opts = erl_syntax_lib:fold( fun find_opts/2, [], Forms ),
 	Props = erl_syntax_lib:fold( fun find_props/2, [], Forms ),
 	PropForms = [ test_generator( Prop, Opts ) || Prop <- Props ],
-	erl_syntax:revert_forms( [ Forms | PropForms ] ).
+	erl_syntax:revert_forms( [ strip_opts( Forms ) | PropForms ] ).
 
 find_opts( Node, Opts ) ->
 	try
@@ -16,6 +16,18 @@ find_opts( Node, Opts ) ->
 	catch
 		throw:syntax_error    -> Opts;
 		error:{ badmatch, _ } -> Opts
+	end.
+
+strip_opts( Forms ) ->
+	erl_syntax_lib:map( fun strip_opt/1, Forms ).
+
+strip_opt( Node ) ->
+	try
+		{ proper_opts, _ } = erl_syntax_lib:analyze_wild_attribute( Node ),
+		erl_syntax:comment( "stripped proper_opts" )
+	catch
+		throw:syntax_error    -> Node;
+		error:{ badmatch, _ } -> Node
 	end.
 
 opt_to_property( X ) ->
