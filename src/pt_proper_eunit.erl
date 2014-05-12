@@ -67,8 +67,8 @@ pos( X ) ->
 
 test_generator( { Name, Pos }, AllOpts ) ->
 	TestName = atom_to_list( Name ) ++ "_test_",
-	Opts = proplists:get_all_values( Name, AllOpts )
-		++ proplists:get_all_values( global, AllOpts ),
+	Opts = proplists:append_values( Name, AllOpts )
+		++ proplists:append_values( global, AllOpts ),
 	Tuple = erl_syntax:tuple( [ Pos, test_fun_expr( Name, Opts ) ] ),
 	erl_syntax:function( erl_syntax:atom( TestName ),
 		[ erl_syntax:clause( none, [ Tuple ] ) ] ).
