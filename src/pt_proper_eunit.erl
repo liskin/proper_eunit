@@ -90,12 +90,19 @@ call_quickcheck(Test, Opts) ->
 		erl_syntax:atom(quickcheck), [Test, Opts]).
 
 call_envs(Envs, X) ->
-	lists:foldl(fun call_env/2, X, Envs).
+	lists:foldl(fun call_env/2, X, pick_first_timeout(Envs)).
 
 call_env({timeout, T}, Test) ->
 	erl_syntax:tuple([erl_syntax:atom(timeout), erl_syntax:integer(T), Test]);
 call_env({F, _A}, Test) ->
 	erl_syntax:application(erl_syntax:atom(F), [Test]).
+
+pick_first_timeout(Envs) ->
+	IsTimeout = fun({timeout, _}) -> true; (_) -> false end,
+	case lists:partition(IsTimeout, Envs) of
+		{[T|_], Rest} -> [T|Rest];
+		{[   ], Envs} -> Envs
+	end.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
