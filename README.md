@@ -25,3 +25,26 @@ erl:
     =======================================================
       Test passed.
     ok
+
+## Specifying options
+
+Options for `proper:quickcheck/2` may be specified using the `proper_opts`
+attribute:
+
+    -proper_opts([500, any_to_integer]).
+
+Options specific to one property may be specified as well:
+
+    -proper_opts([{prop_1, [500, any_to_integer]}]).
+
+To customize the eunit test object, `proper_eunit` understands the `eunit_env`
+option:
+
+    -proper_opts([{eunit_env, foo/1}])
+    foo(Test) ->
+        {setup, …, Test}.
+
+To just change the timeout, timeout may be specified directly (one doesn't
+need to create a function that wraps `Test` in `{timeout, …}`):
+
+    -proper_opts([{prop_1, {eunit_env, {timeout, 10}}}]).
