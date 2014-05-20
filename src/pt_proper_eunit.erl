@@ -69,9 +69,11 @@ test_generator({Name, Pos}, AllOpts) ->
 	TestName = atom_to_list(Name) ++ "_test_",
 	Opts = proplists:append_values(Name, AllOpts)
 		++ proplists:append_values(global, AllOpts),
-	Tuple = erl_syntax:tuple([Pos, test_fun_expr(Name, Opts)]),
+	{[EUnitEnvOpts], ProperOpts} = proplists:split(Opts, [eunit_env]),
+	EUnitEnv = proplists:append_values(eunit_env, EUnitEnvOpts),
+	Tuple = erl_syntax:tuple([Pos, test_fun_expr(Name, ProperOpts)]),
 	erl_syntax:function(erl_syntax:atom(TestName),
-		[erl_syntax:clause(none, [Tuple])]).
+		[erl_syntax:clause(none, [call_envs(EUnitEnv, Tuple)])]).
 
 test_fun_expr(Name, Opts) ->
 	Assert = assert(call_quickcheck(call_prop(Name), erl_syntax:abstract(Opts))),
@@ -86,6 +88,14 @@ call_prop(Name) ->
 call_quickcheck(Test, Opts) ->
 	erl_syntax:application(erl_syntax:atom(proper),
 		erl_syntax:atom(quickcheck), [Test, Opts]).
+
+call_envs(Envs, X) ->
+	lists:foldl(fun call_env/2, X, Envs).
+
+call_env({timeout, T}, Test) ->
+	erl_syntax:tuple([erl_syntax:atom(timeout), erl_syntax:integer(T), Test]);
+call_env({F, _A}, Test) ->
+	erl_syntax:application(erl_syntax:atom(F), [Test]).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
