@@ -44,6 +44,9 @@ option:
     foo(Test) ->
         {setup, …, Test}.
 
+Note that `foo/1` is equivalent to `{foo, 1}`, and `{M, F, A}` is supported as
+well.
+
 To just change the timeout, timeout may be specified directly (one doesn't
 need to create a function that wraps `Test` in `{timeout, …}`):
 

@@ -94,8 +94,10 @@ call_envs(Envs, X) ->
 
 call_env({timeout, T}, Test) ->
 	erl_syntax:tuple([erl_syntax:atom(timeout), erl_syntax:integer(T), Test]);
-call_env({F, _A}, Test) ->
-	erl_syntax:application(erl_syntax:atom(F), [Test]).
+call_env({F, 1}, Test) ->
+	erl_syntax:application(erl_syntax:atom(F), [Test]);
+call_env({M, F, 1}, Test) ->
+	erl_syntax:application(erl_syntax:atom(M), erl_syntax:atom(F), [Test]).
 
 pick_first_timeout(Envs) ->
 	IsTimeout = fun({timeout, _}) -> true; (_) -> false end,
