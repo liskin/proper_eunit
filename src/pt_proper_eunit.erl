@@ -50,7 +50,7 @@ is_prop_name(Name) when is_list(Name) ->
 	lists:prefix("prop_", Name).
 
 find_props(Forms) ->
-	erl_syntax_lib:fold(fun find_props/2, [], Forms).
+	lists:reverse(erl_syntax_lib:fold(fun find_props/2, [], Forms)).
 
 find_props(Node, Props) ->
 	try
